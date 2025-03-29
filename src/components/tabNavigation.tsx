@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import mail from "../assets/mail.svg";
 import threads from "../assets/treaths.svg";
