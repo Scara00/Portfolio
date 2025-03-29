@@ -1,0 +1,35 @@
+
+
+
+
+/* Importa il font Roboto da Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&display=swap');
+@import './fonts/customFont.css';
+
+/* Applica il font Roboto a tutto il documento */
+body {
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+    margin: 0;
+      display: flex;
+  background-color: #fff;
+}
+
+.chivo-mono{
+  font-family: "Chivo Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: lighter;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.agera-mono {
+  font-family: "Agera", monospace;
+  font-optical-sizing: auto;
+  font-weight: lighter;
+  font-style: normal;
+  color: #4763FE;
+  font-size: 280px;
+  text-align: center;
+  line-height: 0.8;
+}
