@@ -71,7 +71,7 @@ const TabNavigation = () => {
       </IconContainer>
 
       <IconContainer
-        href="https://github.com/yourusername"
+        href="https://github.com/Scara00/Portfolio"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub">

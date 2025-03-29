@@ -1,44 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import avatar from "../assets/avatar.png";
-import TabNavigation from "../components/tabNavigation";
-import moment from "moment";
-import { getPosition } from "../utils/function";
+import useDeviceType from "../hooks/useDeviceType";
 
-const Container = styled.div`
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
-  gap: 24px;
 
-  background: radial-gradient(
-    circle,
-    rgba(221, 226, 255, 1) 26%,
-    rgba(255, 255, 255, 1) 100%
-  );
-`;
-const ContainerTextName = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 32px 120px;
-`;
-const ContainerTextPositionTime = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 32px 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-`;
-
-const TextName = styled.div`
-  position: relative;
   z-index: 1; /* Assicura che il testo sia sotto l'immagine */
   animation: backInLeft 2s ease-in-out forwards;
   @keyframes backInLeft {
@@ -59,7 +26,7 @@ const TextName = styled.div`
 
 const Image = styled.img`
   height: auto;
-  max-width: 400px; /* Controllo larghezza massima dell'immagine */
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -84,50 +51,20 @@ const Image = styled.img`
 `;
 
 const Home: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState<string>(
-    moment().format("HH:mm:ss A")
-  ); // Get current time
-  const [location, setLocation] = useState<string>("Milan, IT"); // Default value
-
-  useEffect(() => {
-    // Imposta la lingua italiana
-    moment.locale("it");
-    // Aggiorna l'orario ogni secondo
-    const timer = setInterval(() => {
-      setCurrentTime(moment().format("HH:mm:ss A"));
-    }, 1000);
-    fetchLocation();
-    // Pulisci il timer quando il componente viene smontato
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  // Ottieni la posizione
-  const fetchLocation = async () => {
-    try {
-      const position = await getPosition();
-      setLocation(position);
-    } catch (error) {
-      console.error("Error getting position:", error);
-    }
-  };
+  const { isMobile, isTablet } = useDeviceType();
 
   return (
     <>
-      <Container>
-        <ContainerTextName>
-          <div className="chivo-mono">cristian/</div>
-        </ContainerTextName>
-        <ContainerTextPositionTime>
-          <div className="chivo-mono">{location}</div>
-          <div className="chivo-mono">{currentTime}</div>
-        </ContainerTextPositionTime>
-
-        <TextName className="agera-mono ">CRISTIAN SCARATTI</TextName>
-        <Image src={avatar} alt="Avatar" />
-      </Container>
-      <TabNavigation></TabNavigation>
+      <TextName
+        className="agera-mono "
+        style={{ fontSize: isMobile ? "70px" : isTablet ? "150px" : "280px" }}>
+        CRISTIAN SCARATTI
+      </TextName>
+      <Image
+        src={avatar}
+        alt="Avatar"
+        style={{ maxWidth: isMobile ? "100px" : isTablet ? "150px" : "400px" }}
+      />
     </>
   );
 };
