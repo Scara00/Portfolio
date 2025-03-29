@@ -7,7 +7,7 @@ const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
 
   z-index: 1; /* Assicura che il testo sia sotto l'immagine */
-  animation: backInLeft 2s ease-in-out forwards;
+  animation: backInLeft 1.5s ease-in-out forwards;
   @keyframes backInLeft {
     0% {
       transform: translateX(-100vw) scale(0.3);
@@ -31,7 +31,7 @@ const Image = styled.img`
   left: 50%;
   transform: translate(-50%, -50%); /* Centra correttamente l'immagine */
   z-index: 2; /* Assicura che l'immagine sia sopra il testo */
-  animation: backInRight 2s ease-in-out forwards;
+  animation: backInRight 1.5s ease-in-out forwards;
 
   @keyframes backInRight {
     0% {

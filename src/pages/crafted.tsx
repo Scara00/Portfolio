@@ -9,18 +9,18 @@ const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
   color: rgba(71, 99, 254, 1);
   z-index: 4; /* Assicura che il testo sia sotto l'immagine */
-  animation: backInLeft 2s ease-in-out forwards;
-  @keyframes backInLeft {
+  animation: backInDown 1s ease-in-out forwards;
+  @keyframes backInDown {
     0% {
-      transform: translateX(-100vw) scale(0.3);
+      transform: translateY(-100vh) scale(0.3);
       opacity: 0;
     }
     80% {
-      transform: translateX(0) scale(0.7);
+      transform: translateY(0) scale(0.7);
       opacity: 0.5;
     }
     100% {
-      transform: translateX(0) scale(1);
+      transform: translateY(0) scale(1);
       opacity: 1;
     }
   }
@@ -59,8 +59,10 @@ const Crafted: React.FC = () => {
         alt="Avatar"
         style={{
           maxWidth: isMobile ? "100px" : isTablet ? "200px" : "500px",
-          transform: "transform: translate(50%, 50%) scale(1)",
+          transform: "transform: translate(-40%, -40%) scale(1)",
           boxShadow: "-4px -4px 12px 0px rgba(0, 0, 0, 0.12)",
+          top: "50%",
+          left: "50%",
           borderRadius: "8px",
           zIndex: 2,
         }}
@@ -70,7 +72,7 @@ const Crafted: React.FC = () => {
         alt="Avatar"
         style={{
           maxWidth: isMobile ? "100px" : isTablet ? "200px" : "500px",
-          transform: "translate(-20%, -20%)",
+          transform: "translate(-40%, -40%) scale(1)",
           boxShadow: "-4px -4px 12px 0px rgba(0, 0, 0, 0.12)",
           borderRadius: "8px",
           top: "50%",
