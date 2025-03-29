@@ -7,7 +7,7 @@ import { getPosition } from "../utils/function";
 import Crafted from "./crafted";
 import useDeviceType from "../hooks/useDeviceType";
 import { AnimatePresence, motion } from "framer-motion";
-import About from "./about";
+import About from "./skills2";
 import Contact from "./contact";
 
 const Container = styled.div`
@@ -64,7 +64,7 @@ const Portfolio: React.FC = () => {
       case 1:
         return "CRAFTED";
       case 2:
-        return "ABOUT";
+        return "SKILLS";
       case 3:
         return "CONTACT";
       default:

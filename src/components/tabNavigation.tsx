@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import mail from "../assets/mail.svg";
-import threads from "../assets/treaths.svg";
-import github from "../assets/github.svg";
-import linkedin from "../assets/linkedin.svg";
+import mail from "../assets/icons/mail.svg";
+import threads from "../assets/icons/treaths.svg";
+import github from "../assets/icons/github.svg";
+import linkedin from "../assets/icons/linkedin.svg";
 
 const Container = styled.div`
   position: absolute;

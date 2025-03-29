@@ -31,7 +31,7 @@ const Contact: React.FC = () => {
       <TextName
         className="agera-mono"
         style={{ fontSize: isMobile ? "70px" : isTablet ? "150px" : "280px" }}>
-        CONTACT
+        LET'S KEEP IN TOUCH
       </TextName>
       {/* Add your contact content here */}
     </>
