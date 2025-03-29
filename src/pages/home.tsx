@@ -26,7 +26,6 @@ const TextName = styled.div<{ isMobile?: boolean }>`
 
 const Image = styled.img`
   height: auto;
-
   position: absolute;
   top: 50%;
   left: 50%;
