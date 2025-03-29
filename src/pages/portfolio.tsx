@@ -7,8 +7,9 @@ import { getPosition } from "../utils/function";
 import Crafted from "./crafted";
 import useDeviceType from "../hooks/useDeviceType";
 import { AnimatePresence, motion } from "framer-motion";
-import About from "./skills2";
+
 import Contact from "./contact";
+import Skills from "./Skills";
 
 const Container = styled.div`
   height: 100dvh;
@@ -198,7 +199,7 @@ const Portfolio: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.2 }}
             transition={{ duration: 0.5 }}>
-            <About />
+            <Skills />
           </motion.div>
         );
       case 3:
