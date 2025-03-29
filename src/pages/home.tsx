@@ -5,7 +5,6 @@ import useDeviceType from "../hooks/useDeviceType";
 
 const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
-
   z-index: 1; /* Assicura che il testo sia sotto l'immagine */
   animation: backInLeft 1.5s ease-in-out forwards;
   @keyframes backInLeft {

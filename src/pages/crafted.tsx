@@ -45,7 +45,7 @@ const Crafted: React.FC = () => {
         src={dashboard}
         alt="Avatar"
         style={{
-          maxWidth: isMobile ? "100px" : isTablet ? "200px" : "500px",
+          maxWidth: isMobile ? "150px" : isTablet ? "200px" : "500px",
           transform: "translate(-80%, -80%) scale(1)",
           boxShadow: "-4px -4px 12px 0px rgba(0, 0, 0, 0.12)",
           borderRadius: "8px",
@@ -58,7 +58,7 @@ const Crafted: React.FC = () => {
         src={loginPCA}
         alt="Avatar"
         style={{
-          maxWidth: isMobile ? "100px" : isTablet ? "200px" : "500px",
+          maxWidth: isMobile ? "150px" : isTablet ? "200px" : "500px",
           transform: "transform: translate(-40%, -40%) scale(1)",
           boxShadow: "-4px -4px 12px 0px rgba(0, 0, 0, 0.12)",
           top: "50%",
@@ -71,7 +71,7 @@ const Crafted: React.FC = () => {
         src={HomePCA}
         alt="Avatar"
         style={{
-          maxWidth: isMobile ? "100px" : isTablet ? "200px" : "500px",
+          maxWidth: isMobile ? "150px" : isTablet ? "200px" : "500px",
           transform: "translate(-40%, -40%) scale(1)",
           boxShadow: "-4px -4px 12px 0px rgba(0, 0, 0, 0.12)",
           borderRadius: "8px",
