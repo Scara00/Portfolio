@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import useDeviceType from "../hooks/useDeviceType";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 // Import your icons
 import aws from "../assets/icons/aws-svgrepo-com.svg";
 import angular from "../assets/icons/angular-svgrepo-com.svg";
@@ -10,6 +10,8 @@ import flutter from "../assets/icons/flutter-svgrepo-com.svg";
 import javascriptIcon from "../assets/icons/javascript-svgrepo-com.svg";
 import react from "../assets/icons/react-svgrepo-com.svg";
 import ts from "../assets/icons/typescript-official-svgrepo-com.svg";
+import figma from "../assets/icons/figma-svgrepo-com.svg";
+import ModalSkillView from "../view/modalSkillView";
 
 const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
@@ -59,15 +61,109 @@ const BouncingIcon = styled(motion.div)`
   }
 `;
 
+// Modal Components
+const Backdrop = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContent = styled(motion.div)<{ isMobile: boolean }>`
+  background: white;
+  border-radius: ${(props) => (props.isMobile ? "0" : "12px")};
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  position: relative;
+  width: ${(props) => (props.isMobile ? "100%" : "500px")};
+  height: ${(props) => (props.isMobile ? "100%" : "auto")};
+  max-width: 90%;
+  max-height: ${(props) => (props.isMobile ? "100%" : "80vh")};
+  overflow: auto;
+  z-index: 30;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: rgba(71, 99, 254, 1);
+`;
+
 // Define skills data
 const skills = [
-  { id: 1, name: "React", icon: aws },
-  { id: 2, name: "Node.js", icon: react },
-  { id: 3, name: "JavaScript", icon: angular },
-  { id: 4, name: "HTML5", icon: ts },
-  { id: 5, name: "CSS3", icon: javascriptIcon },
-  { id: 6, name: "Git", icon: flutter },
-  { id: 7, name: "Figma", icon: electron },
+  {
+    id: 1,
+    name: "AWS",
+    icon: aws,
+    description: "",
+
+    percentageSkill: 20,
+  },
+  {
+    id: 2,
+    name: "React js",
+    icon: react,
+    description: "",
+
+    percentageSkill: 60,
+  },
+  {
+    id: 3,
+    name: "Angular",
+    icon: angular,
+    description: "",
+
+    percentageSkill: 90,
+  },
+  {
+    id: 4,
+    name: "Typescript",
+    icon: ts,
+    description: "",
+
+    percentageSkill: 90,
+  },
+  {
+    id: 5,
+    name: "Javascript",
+    icon: javascriptIcon,
+    description: "",
+
+    percentageSkill: 90,
+  },
+  {
+    id: 6,
+    name: "Flutter",
+    icon: flutter,
+    description: "",
+
+    percentageSkill: 90,
+  },
+  {
+    id: 7,
+    name: "Electron",
+    icon: electron,
+    description: "",
+    percentageSkill: 90,
+  },
+  {
+    id: 8,
+    name: "Figma",
+    icon: figma,
+    description: "",
+    percentageSkill: 90,
+  },
 ];
 
 // Generate a random number between min and max
@@ -88,8 +184,15 @@ const Skills: React.FC = () => {
       velocityY: number;
       size: number;
       icon: string;
+      name: string;
     }>
   >([]);
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState<(typeof skills)[0] | null>(
+    null
+  );
 
   // Calculate icon size based on device
   const iconSize = isMobile ? 40 : isTablet ? 50 : 80;
@@ -114,14 +217,30 @@ const Skills: React.FC = () => {
         id: skill.id,
         x: random(iconSize, width - iconSize),
         y: random(iconSize, height - iconSize),
-        velocityX: random(-2, 2),
-        velocityY: random(-2, 2),
+        velocityX: random(-3, 3), // Moderate speed
+        velocityY: random(-3, 3), // Moderate speed
         size: iconSize,
         icon: skill.icon,
+        name: skill.name,
       };
     });
 
     setBouncingIcons(newBouncingIcons);
+  };
+
+  // Handle icon click - open modal
+  const handleIconClick = (icon: (typeof bouncingIcons)[0]) => {
+    setSelectedSkill(skills.find((skill) => skill.id === icon.id) || null);
+    setShowModal(true);
+
+    // Pause animation when modal is open
+    // This could be implemented by checking showModal in the animate function
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedSkill(null);
   };
 
   // Animation loop for bouncing effect
@@ -134,6 +253,12 @@ const Skills: React.FC = () => {
   }, [bouncingIcons.length, containerSize]);
 
   const animate = () => {
+    // Skip animation if modal is open
+    if (showModal) {
+      requestAnimationFrame(animate);
+      return;
+    }
+
     setBouncingIcons((prevIcons) => {
       return prevIcons.map((icon) => {
         let newX = icon.x + icon.velocityX;
@@ -165,6 +290,7 @@ const Skills: React.FC = () => {
 
     requestAnimationFrame(animate);
   };
+
   return (
     <>
       <TextName
@@ -186,6 +312,7 @@ const Skills: React.FC = () => {
             }}
             transition={{ type: "spring", damping: 10 }}
             whileHover={{ scale: 1.2, zIndex: 10 }}
+            onClick={() => handleIconClick(icon)}
             style={{
               width: icon.size,
               height: icon.size,
@@ -202,6 +329,44 @@ const Skills: React.FC = () => {
           </BouncingIcon>
         ))}
       </IconsContainer>
+
+      {/* Modal with AnimatePresence for smooth enter/exit animations */}
+      <AnimatePresence>
+        {showModal && (
+          <Backdrop
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeModal}>
+            <ModalContent
+              isMobile={isMobile}
+              initial={{
+                opacity: 0,
+                scale: isMobile ? 1 : 0.8,
+                y: isMobile ? "100%" : 0,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: isMobile ? 1 : 0.8,
+                y: isMobile ? "100%" : 0,
+              }}
+              onClick={(e) => e.stopPropagation()}>
+              <CloseButton onClick={closeModal}>×</CloseButton>
+              <ModalSkillView
+                title={selectedSkill?.name || ""}
+                description={selectedSkill?.description || ""}
+                percentageSkill={
+                  selectedSkill?.percentageSkill || 0
+                }></ModalSkillView>
+            </ModalContent>
+          </Backdrop>
+        )}
+      </AnimatePresence>
     </>
   );
 };
