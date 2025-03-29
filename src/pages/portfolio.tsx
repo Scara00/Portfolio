@@ -20,6 +20,8 @@ const Container = styled.div`
   position: relative;
   gap: 24px;
   overflow: hidden;
+  overscroll-behavior: none; /* Prevent pull-to-refresh */
+  touch-action: none; /* Disable browser handling of all panning and zooming gestures */
 
   background: radial-gradient(
     circle,
@@ -81,6 +83,14 @@ const Portfolio: React.FC = () => {
     }, 1000);
     fetchLocation();
 
+    // Prevent pull-to-refresh
+    const preventDefault = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+
+    // Add document-level touch event listeners to prevent overscroll
+    document.addEventListener("touchmove", preventDefault, { passive: false });
+
     // Add all event listeners
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart);
@@ -90,6 +100,7 @@ const Portfolio: React.FC = () => {
     // Clean up all event listeners
     return () => {
       clearInterval(timer);
+      document.removeEventListener("touchmove", preventDefault);
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
@@ -124,6 +135,7 @@ const Portfolio: React.FC = () => {
 
   // Touch events for mobile
   const handleTouchStart = (e: TouchEvent) => {
+    // Store the starting position
     setTouchStartY(e.touches[0].clientY);
   };
 
