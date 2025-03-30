@@ -246,7 +246,7 @@ const Portfolio: React.FC = () => {
         {renderActiveSection()}
       </AnimatePresence>
 
-      <TabNavigation />
+      <TabNavigation activeSection={activeSection} />
     </Container>
   );
 };
