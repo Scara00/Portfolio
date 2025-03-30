@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import mail from "../assets/icons/mail.svg";
 import threads from "../assets/icons/treaths.svg";
 import github from "../assets/icons/github.svg";
 import linkedin from "../assets/icons/linkedin.svg";
+import useDeviceType from "../hooks/useDeviceType";
 
 interface TabNavigationProps {
   activeSection?: number;
@@ -18,10 +19,19 @@ const AnimationWrapper = styled(motion.div)`
   z-index: 100;
 `;
 
-const TabContainer = styled(motion.div)<{ isContactSection?: boolean }>`
+const TabContainer = styled(motion.div)<{
+  isContactSection?: boolean;
+  isMobile: boolean;
+}>`
   display: flex;
-  gap: ${(props) => (props.isContactSection ? "64px" : "32px")};
-  padding: ${(props) => (props.isContactSection ? "64px" : "10px 32px")};
+  gap: ${(props) => {
+    if (props.isMobile) return props.isContactSection ? "24px" : "16px";
+    return props.isContactSection ? "64px" : "32px";
+  }};
+  padding: ${(props) => {
+    if (props.isMobile) return props.isContactSection ? "24px" : "8px 16px";
+    return props.isContactSection ? "64px" : "10px 32px";
+  }};
   border-radius: 1000px;
   border: ${(props) => (props.isContactSection ? "none" : "1px solid #bcbcbc")};
   backdrop-filter: ${(props) =>
@@ -34,27 +44,46 @@ const TabContainer = styled(motion.div)<{ isContactSection?: boolean }>`
     props.isContactSection ? "0 8px 32px rgba(31, 38, 135, 0.1)" : "none"};
 `;
 
-const IconContainer = styled(motion.a)<{ isContactSection?: boolean }>`
+const IconContainer = styled(motion.a)<{
+  isContactSection?: boolean;
+  isMobile: boolean;
+}>`
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
 
   &:hover {
     transform: scale(1.05)
-      translateY(${(props) => (props.isContactSection ? "-15px" : "-12px")});
+      translateY(
+        ${(props) => {
+          if (props.isMobile) return props.isContactSection ? "-10px" : "-8px";
+          return props.isContactSection ? "-15px" : "-12px";
+        }}
+      );
   }
 
   img {
+    width: 24px;
+    height: 24px;
     transition: all 0.3s ease;
   }
 `;
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
+  // Use the existing device type hook
+  const { isMobile } = useDeviceType();
+
   // Check if we're on the Contact section
   const isContactSection = activeSection === 3;
+
   // Email address
   const emailAddress = "cristian.scaratti00@gmail.com";
+
+  // Fixed icon size
+  const iconSize = 24;
 
   return (
     <LayoutGroup>
@@ -72,7 +101,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
                 transform: "translate(-50%, -50%)",
               }
             : {
-                bottom: "32px",
+                bottom: isMobile ? "16px" : "32px",
                 top: "auto",
                 transform: "translateX(-50%)",
               }
@@ -84,6 +113,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
         }}>
         <TabContainer
           isContactSection={isContactSection}
+          isMobile={isMobile}
           layout
           transition={{
             type: "spring",
@@ -97,6 +127,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
               <IconContainer
                 key={index}
                 isContactSection={isContactSection}
+                isMobile={isMobile}
                 href={
                   index === 0
                     ? `mailto:${emailAddress}?subject=Contatto dal Portfolio`
@@ -119,8 +150,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
                 }
                 layout
                 animate={{
-                  width: isContactSection ? 64 : 24,
-                  height: isContactSection ? 64 : 24,
+                  width: iconSize,
+                  height: iconSize,
                 }}
                 transition={{
                   type: "spring",
@@ -140,8 +171,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
                       : "GitHub"
                   }
                   animate={{
-                    width: isContactSection ? 64 : 24,
-                    height: isContactSection ? 64 : 24,
+                    width: iconSize,
+                    height: iconSize,
                   }}
                   transition={{
                     type: "spring",
