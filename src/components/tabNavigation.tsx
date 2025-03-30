@@ -26,7 +26,7 @@ const TabContainer = styled(motion.div)<{
   display: flex;
   gap: ${(props) => {
     if (props.isMobile) return props.isContactSection ? "24px" : "16px";
-    return props.isContactSection ? "64px" : "32px";
+    return "64px";
   }};
   padding: ${(props) => {
     if (props.isMobile) return props.isContactSection ? "24px" : "8px 16px";
@@ -83,7 +83,13 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
   const emailAddress = "cristian.scaratti00@gmail.com";
 
   // Fixed icon size
-  const iconSize = 24;
+  const iconSize = isMobile
+    ? isContactSection
+      ? 24
+      : 20
+    : isContactSection
+    ? 64
+    : 24;
 
   return (
     <LayoutGroup>
