@@ -33,15 +33,16 @@ const TabContainer = styled(motion.div)<{
     return props.isContactSection ? "64px" : "10px 32px";
   }};
   border-radius: 1000px;
-  border: ${(props) => (props.isContactSection ? "none" : "1px solid #bcbcbc")};
+  border: ${(props) =>
+    props.isContactSection ? "none" : "1px solid rgba(188, 188, 188, 0.5)"};
   backdrop-filter: ${(props) =>
     props.isContactSection ? "blur(7px)" : "none"};
   background: ${(props) =>
     props.isContactSection
       ? "rgba(255, 255, 255, 0.15)"
-      : "rgba(255, 255, 255, 0.60)"};
+      : "rgba(255, 255, 255, 0.50)"};
   box-shadow: ${(props) =>
-    props.isContactSection ? "0 8px 32px rgba(31, 38, 135, 0.1)" : "none"};
+    props.isContactSection ? "0 4px 4px rgba(31, 38, 135, 0.1)" : "none"};
 `;
 
 const IconContainer = styled(motion.a)<{
