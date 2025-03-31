@@ -85,7 +85,7 @@ const Crafted: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselActive, setCarouselActive] = useState(false);
   const [scrolling, setScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef(null);
   const lastScrollXRef = useRef<number>(0);
 
   // Touch handling
@@ -166,27 +166,31 @@ const Crafted: React.FC = () => {
       // Set a timeout to detect when scrolling stops
       scrollTimeoutRef.current = setTimeout(() => {
         setScrolling(false);
-        
+
         // Determine scroll direction
         if (Math.abs(currentScrollX - lastScrollXRef.current) > 10) {
           const scrollRight = currentScrollX > lastScrollXRef.current;
-          
+
           // Update image index based on scroll direction
           if (scrollRight) {
             // Scrolled right, show previous image
-            setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+            setActiveIndex((prev) =>
+              prev === 0 ? images.length - 1 : prev - 1
+            );
           } else {
             // Scrolled left, show next image
-            setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+            setActiveIndex((prev) =>
+              prev === images.length - 1 ? 0 : prev + 1
+            );
           }
         }
-        
+
         // Reset scroll position (with a small delay to avoid visual glitches)
         setTimeout(() => {
           if (swipeSurface) {
             swipeSurface.scrollTo({
               left: 0,
-              behavior: 'auto'
+              behavior: "auto",
             });
           }
           lastScrollXRef.current = 0;
@@ -196,10 +200,10 @@ const Crafted: React.FC = () => {
       lastScrollXRef.current = currentScrollX;
     };
 
-    swipeSurface.addEventListener('scroll', handleScroll);
-    
+    swipeSurface.addEventListener("scroll", handleScroll);
+
     return () => {
-      swipeSurface.removeEventListener('scroll', handleScroll);
+      swipeSurface.removeEventListener("scroll", handleScroll);
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
@@ -227,9 +231,11 @@ const Crafted: React.FC = () => {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null || 
-        touchStartYRef.current === null || 
-        touchStartTimeRef.current === null) {
+    if (
+      touchStartXRef.current === null ||
+      touchStartYRef.current === null ||
+      touchStartTimeRef.current === null
+    ) {
       return;
     }
 
@@ -240,7 +246,11 @@ const Crafted: React.FC = () => {
     const touchDiffY = Math.abs(touchStartYRef.current - touchEndY);
 
     // Only handle as swipe if more horizontal than vertical and meets thresholds
-    if (touchDiffY < 50 && touchTime < SWIPE_TIMEOUT && Math.abs(touchDiffX) > SWIPE_THRESHOLD) {
+    if (
+      touchDiffY < 50 &&
+      touchTime < SWIPE_TIMEOUT &&
+      Math.abs(touchDiffX) > SWIPE_THRESHOLD
+    ) {
       if (!carouselActive) {
         // Activate carousel on first swipe
         setCarouselActive(true);
@@ -378,20 +388,20 @@ const Crafted: React.FC = () => {
           {images.map((image, index) => {
             // Calculate position relative to active image
             const position = index - activeIndex;
-            
+
             // Handle wraparound
             let normalizedPosition = position;
             if (position < -1) normalizedPosition += images.length;
             if (position > 1) normalizedPosition -= images.length;
-            
+
             // Only render the active image and immediate neighbors
-            const shouldRender = 
-              normalizedPosition === 0 || 
-              normalizedPosition === 1 || 
+            const shouldRender =
+              normalizedPosition === 0 ||
+              normalizedPosition === 1 ||
               normalizedPosition === -1;
-              
+
             if (!shouldRender) return null;
-            
+
             return (
               <CarouselItem
                 key={image.alt}
