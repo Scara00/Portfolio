@@ -29,8 +29,8 @@ const TabContainer = styled(motion.div)<{
     return props.isContactSection ? "64px" : "32px";
   }};
   padding: ${(props) => {
-    if (props.isMobile) return props.isContactSection ? "24px" : "8px 16px";
-    return props.isContactSection ? "64px" : "10px 32px";
+    if (props.isMobile) return props.isContactSection ? "24px" : "12px 24px";
+    return props.isContactSection ? "64px" : "16px 32px";
   }};
   border-radius: 1000px;
   border: ${(props) =>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Home from "./home";
 import TabNavigation from "../components/tabNavigation";
 import styled from "styled-components";
@@ -52,12 +52,19 @@ const Portfolio: React.FC = () => {
     moment().format("HH:mm:ss A")
   );
   const [location, setLocation] = useState<string>("Milan, IT");
-  // Replace boolean with numeric index (0-3) for four sections
   const [activeSection, setActiveSection] = useState<number>(0);
   const { isMobile } = useDeviceType();
 
   // Track touch start position
-  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
+  // Refs for scroll handling
+  const lastScrollTimeRef = useRef<number>(0);
+  const scrollAccumulatorRef = useRef<number>(0);
+  const activeSectionRef = useRef<number>(0); // Keep a ref to track current section
+  const isTransitioningRef = useRef<boolean>(false);
+  const SCROLL_DELAY = 1000; // Increased to prevent accidental triggers
+  const SCROLL_THRESHOLD = 50; // Increased threshold for more deliberate scrolling
 
   // Helper function to get section title
   const getSectionTitle = (index: number): string => {
@@ -74,42 +81,52 @@ const Portfolio: React.FC = () => {
         return "HOME";
     }
   };
+
+  // Update ref when activeSection state changes
   useEffect(() => {
-    fetchLocation();
-  }, []);
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
 
   useEffect(() => {
+    fetchLocation();
+
     // Existing time logic
     moment.locale("it");
     const timer = setInterval(() => {
       setCurrentTime(moment().format("HH:mm:ss A"));
     }, 1000);
-    fetchLocation();
 
-    // Prevent pull-to-refresh
-    const preventDefault = (e: TouchEvent) => {
-      e.preventDefault();
-    };
-
-    // Add document-level touch event listeners to prevent overscroll
-    document.addEventListener("touchmove", preventDefault, { passive: false });
+    // Function to handle wheel events with proper binding
+    const wheelHandler = (e: WheelEvent) => handleWheel(e);
+    const touchStartHandler = (e: TouchEvent) => handleTouchStart(e);
+    const touchEndHandler = (e: TouchEvent) => handleTouchEnd(e);
+    const keyDownHandler = (e: KeyboardEvent) => handleKeyDown(e);
 
     // Add all event listeners
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("wheel", wheelHandler, { passive: false });
+    window.addEventListener("touchstart", touchStartHandler, {
+      passive: false,
+    });
+    window.addEventListener("touchend", touchEndHandler);
+    window.addEventListener("keydown", keyDownHandler);
+
+    // Prevent body scrolling
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden"; // Also for html element
 
     // Clean up all event listeners
     return () => {
       clearInterval(timer);
-      document.removeEventListener("touchmove", preventDefault);
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("wheel", wheelHandler);
+      window.removeEventListener("touchstart", touchStartHandler);
+      window.removeEventListener("touchend", touchEndHandler);
+      window.removeEventListener("keydown", keyDownHandler);
+
+      // Restore body scrolling
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
-  }, [touchStartY, activeSection]);
+  }, []); // Empty dependency array to run only once
 
   // Fetch location function
   const fetchLocation = async () => {
@@ -121,64 +138,124 @@ const Portfolio: React.FC = () => {
     }
   };
 
-  // Updated scroll wheel detection for multiple sections
+  // Function to safely change sections with debouncing
+  const changeSection = (direction: number) => {
+    const now = Date.now();
+
+    // Check if we're in a transition or haven't waited long enough
+    if (
+      isTransitioningRef.current ||
+      now - lastScrollTimeRef.current < SCROLL_DELAY
+    ) {
+      // Reset accumulator if we're not changing section to prevent buildup
+      scrollAccumulatorRef.current = 0;
+      return;
+    }
+
+    const currentSection = activeSectionRef.current;
+    let newSection = currentSection + direction;
+
+    // Ensure we stay within bounds
+    if (newSection < 0) newSection = 0;
+    if (newSection > 3) newSection = 3;
+
+    // Only change if different
+    if (newSection !== currentSection) {
+      isTransitioningRef.current = true;
+      setActiveSection(newSection);
+      lastScrollTimeRef.current = now;
+
+      // Reset accumulator after changing section
+      scrollAccumulatorRef.current = 0;
+
+      // Clear transition lock after animation completes
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, SCROLL_DELAY);
+    } else {
+      // Reset accumulator even if we didn't change section
+      scrollAccumulatorRef.current = 0;
+    }
+  };
+
+  // Wheel event handler with better delta filtering
   const handleWheel = (e: WheelEvent) => {
-    // Prevent default scrolling behavior
     e.preventDefault();
 
-    // If scrolling down, go to next section
-    if (e.deltaY > 0) {
-      setActiveSection((prev) => (prev < 3 ? prev + 1 : prev));
-    }
-    // If scrolling up, go to previous section
-    else if (e.deltaY < 0) {
-      setActiveSection((prev) => (prev > 0 ? prev - 1 : prev));
+    // Filter out extremely small deltas (probably from inertial scrolling or trackpads)
+    const absY = Math.abs(e.deltaY);
+
+    // Ignore very small movements that might be noise or inertial scrolling
+    if (absY < 1) return;
+
+    // For very large deltas (typical of mousewheel), normalize them
+    const normalizedDelta = Math.min(absY, 100) * (e.deltaY < 0 ? -1 : 1);
+
+    // Accumulate scroll deltas
+    scrollAccumulatorRef.current += normalizedDelta;
+
+    // Check if accumulated scroll is enough to trigger a section change
+    if (Math.abs(scrollAccumulatorRef.current) > SCROLL_THRESHOLD) {
+      const direction = scrollAccumulatorRef.current > 0 ? 1 : -1;
+      changeSection(direction);
+      // Reset accumulator after attempting a section change
+      scrollAccumulatorRef.current = 0;
     }
   };
 
   // Touch events for mobile
   const handleTouchStart = (e: TouchEvent) => {
-    // Store the starting position
-    setTouchStartY(e.touches[0].clientY);
+    e.preventDefault(); // Prevent default to avoid any browser handling
+    touchStartYRef.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: TouchEvent) => {
-    if (touchStartY === null) return;
+    if (touchStartYRef.current === null) return;
 
     const touchEndY = e.changedTouches[0].clientY;
-    const diff = touchStartY - touchEndY;
+    const diff = touchStartYRef.current - touchEndY;
 
-    // If swipe up, go to next section
-    if (diff > 50) {
-      setActiveSection((prev) => (prev < 3 ? prev + 1 : prev));
-    }
-    // If swipe down, go to previous section
-    else if (diff < -50) {
-      setActiveSection((prev) => (prev > 0 ? prev - 1 : prev));
+    // Determine swipe direction if it exceeds threshold
+    if (Math.abs(diff) > SCROLL_THRESHOLD) {
+      const direction = diff > 0 ? 1 : -1;
+      changeSection(direction);
     }
 
-    setTouchStartY(null);
+    touchStartYRef.current = null;
   };
 
-  // Updated keyboard navigation
+  // Keyboard navigation
   const handleKeyDown = (e: KeyboardEvent) => {
-    // Navigate down
+    let direction = 0;
+
+    // Determine direction based on key
     if (e.key === "ArrowDown" || e.key === "PageDown") {
-      setActiveSection((prev) => (prev < 3 ? prev + 1 : prev));
+      direction = 1;
+    } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+      direction = -1;
     }
-    // Navigate up
-    else if (e.key === "ArrowUp" || e.key === "PageUp") {
-      setActiveSection((prev) => (prev > 0 ? prev - 1 : prev));
+
+    if (direction !== 0) {
+      changeSection(direction);
     }
     // Direct navigation with number keys
-    else if (e.key === "1") {
-      setActiveSection(0);
-    } else if (e.key === "2") {
-      setActiveSection(1);
-    } else if (e.key === "3") {
-      setActiveSection(2);
-    } else if (e.key === "4") {
-      setActiveSection(3);
+    else if (e.key >= "1" && e.key <= "4") {
+      const targetSection = parseInt(e.key) - 1;
+      if (targetSection !== activeSectionRef.current) {
+        const now = Date.now();
+        if (
+          now - lastScrollTimeRef.current >= SCROLL_DELAY &&
+          !isTransitioningRef.current
+        ) {
+          isTransitioningRef.current = true;
+          setActiveSection(targetSection);
+          lastScrollTimeRef.current = now;
+
+          setTimeout(() => {
+            isTransitioningRef.current = false;
+          }, SCROLL_DELAY);
+        }
+      }
     }
   };
 
@@ -188,10 +265,10 @@ const Portfolio: React.FC = () => {
         return (
           <motion.div
             key="home"
-            initial={{ opacity: 0, scale: 1.2 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.5 }}>
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.4 }}>
             <Home />
           </motion.div>
         );
@@ -199,21 +276,21 @@ const Portfolio: React.FC = () => {
         return (
           <motion.div
             key="crafted"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            transition={{ duration: 0.5 }}>
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.4 }}>
             <Crafted />
           </motion.div>
         );
       case 2:
         return (
           <motion.div
-            key="about"
-            initial={{ opacity: 0, scale: 0.8 }}
+            key="skills"
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            transition={{ duration: 0.5 }}>
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.4 }}>
             <Skills />
           </motion.div>
         );
@@ -221,10 +298,10 @@ const Portfolio: React.FC = () => {
         return (
           <motion.div
             key="contact"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            transition={{ duration: 0.5 }}>
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.4 }}>
             <Contact />
           </motion.div>
         );
@@ -245,9 +322,7 @@ const Portfolio: React.FC = () => {
         <div className="chivo-mono">{currentTime}</div>
       </ContainerTextPositionTime>
 
-      <AnimatePresence mode="popLayout">
-        {renderActiveSection()}
-      </AnimatePresence>
+      <AnimatePresence mode="wait">{renderActiveSection()}</AnimatePresence>
 
       <TabNavigation activeSection={activeSection} />
     </Container>

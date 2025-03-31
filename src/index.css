@@ -31,4 +31,6 @@ body {
   color: #4763FE;
   text-align: center;
   line-height: 0.8;
+  mix-blend-mode: darken;
+  user-select: none;
 }
