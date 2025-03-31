@@ -26,7 +26,7 @@ const TabContainer = styled(motion.div)<{
   display: flex;
   gap: ${(props) => {
     if (props.isMobile) return props.isContactSection ? "24px" : "16px";
-    return "64px";
+    return props.isContactSection ? "64px" : "32px";
   }};
   padding: ${(props) => {
     if (props.isMobile) return props.isContactSection ? "24px" : "8px 16px";

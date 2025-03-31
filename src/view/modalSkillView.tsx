@@ -29,9 +29,9 @@ const Container = styled.div`
 const Title = styled.h2`
   font-size: 28px;
   margin: 0;
-  color: rgba(71, 99, 254, 1);
+  color: #000;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
 `;
 
 const Description = styled.p`

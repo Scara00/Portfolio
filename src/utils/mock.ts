@@ -45,7 +45,7 @@ export const skillsMock = [
         id: 5,
         name: "Javascript",
         icon: javascriptIcon,
-        description: "",
+        description: "Ho lavorato su progetti frontend e backend, utilizzando tecnologie come React, Next.js e TypeScript. Mi occupo di sviluppo di componenti riutilizzabili, gestione dello stato, ottimizzazione delle performance e integrazione con API e librerie di terze parti. Sono appassionato di scrittura di codice pulito e scalabile, sempre alla ricerca di soluzioni innovative per migliorare l’esperienza utente.",
 
         percentageSkill: 90,
     },

@@ -36,7 +36,7 @@ export const getPosition = (): Promise<string> => {
                         const data = await response.json();
 
                         // Estrai città e paese dalla risposta di BigDataCloud
-                        const city = data.city || data.locality;
+                        const city = data.locality || data.city;
                         const country = data.countryCode;
 
                         if (city && country) {

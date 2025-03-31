@@ -74,6 +74,9 @@ const Portfolio: React.FC = () => {
         return "HOME";
     }
   };
+  useEffect(() => {
+    fetchLocation();
+  }, []);
 
   useEffect(() => {
     // Existing time logic
