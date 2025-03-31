@@ -84,8 +84,8 @@ const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselActive, setCarouselActive] = useState(false);
-  const [scrolling, setScrolling] = useState(false);
-  const scrollTimeoutRef = useRef(null);
+  // Changed type to NodeJS.Timeout for proper typing
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollXRef = useRef<number>(0);
 
   // Touch handling
@@ -156,7 +156,6 @@ const Crafted: React.FC = () => {
       }
 
       const currentScrollX = swipeSurface.scrollLeft;
-      setScrolling(true);
 
       // Clear previous timeout
       if (scrollTimeoutRef.current) {
@@ -165,8 +164,6 @@ const Crafted: React.FC = () => {
 
       // Set a timeout to detect when scrolling stops
       scrollTimeoutRef.current = setTimeout(() => {
-        setScrolling(false);
-
         // Determine scroll direction
         if (Math.abs(currentScrollX - lastScrollXRef.current) > 10) {
           const scrollRight = currentScrollX > lastScrollXRef.current;
