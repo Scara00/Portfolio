@@ -62,27 +62,42 @@ const StyledImage = styled(motion.img)`
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
-// Invisible touch surface for swipe detection
+// Touch surface for swipe detection with horizontal scroll
 const SwipeSurface = styled.div<{ carouselActive: boolean }>`
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  z-index: ${(props) => (props.carouselActive ? 4 : -1)};
+  z-index: ${(props) => (props.carouselActive ? 15 : 10)};
   touch-action: pan-y; /* Allow vertical scrolling */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  -ms-overflow-scrolling: touch; /* Enable momentum scrolling in iOS */
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari/Opera */
+  }
 `;
 
 const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselActive, setCarouselActive] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollXRef = useRef<number>(0);
 
   // Touch handling
   const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
   const touchStartTimeRef = useRef<number | null>(null);
   const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
   const SWIPE_TIMEOUT = 300; // Maximum time for swipe in milliseconds
+  const SCROLL_DELAY = 150; // Delay after scroll stops to trigger image change
+
+  // Ref for the swipe surface element
+  const swipeSurfaceRef = useRef<HTMLDivElement>(null);
 
   // Array of images for the carousel
   const images = [
@@ -128,29 +143,110 @@ const Crafted: React.FC = () => {
     };
   }, [carouselActive, images.length]);
 
+  // Handle scroll events for horizontal scrolling
+  useEffect(() => {
+    const swipeSurface = swipeSurfaceRef.current;
+    if (!swipeSurface) return;
+
+    const handleScroll = () => {
+      if (!carouselActive) {
+        // Activate carousel on first horizontal scroll
+        setCarouselActive(true);
+        return;
+      }
+
+      const currentScrollX = swipeSurface.scrollLeft;
+      setScrolling(true);
+
+      // Clear previous timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Set a timeout to detect when scrolling stops
+      scrollTimeoutRef.current = setTimeout(() => {
+        setScrolling(false);
+        
+        // Determine scroll direction
+        if (Math.abs(currentScrollX - lastScrollXRef.current) > 10) {
+          const scrollRight = currentScrollX > lastScrollXRef.current;
+          
+          // Update image index based on scroll direction
+          if (scrollRight) {
+            // Scrolled right, show previous image
+            setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+          } else {
+            // Scrolled left, show next image
+            setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+          }
+        }
+        
+        // Reset scroll position (with a small delay to avoid visual glitches)
+        setTimeout(() => {
+          if (swipeSurface) {
+            swipeSurface.scrollTo({
+              left: 0,
+              behavior: 'auto'
+            });
+          }
+          lastScrollXRef.current = 0;
+        }, 50);
+      }, SCROLL_DELAY);
+
+      lastScrollXRef.current = currentScrollX;
+    };
+
+    swipeSurface.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      swipeSurface.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [carouselActive, images.length]);
+
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
     touchStartTimeRef.current = Date.now();
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Handle touch move if needed
+    if (
+      touchStartXRef.current !== null &&
+      touchStartYRef.current !== null &&
+      Math.abs(e.touches[0].clientX - touchStartXRef.current) >
+        Math.abs(e.touches[0].clientY - touchStartYRef.current) * 2
+    ) {
+      // If horizontal movement is significantly more than vertical
+      // We could add additional logic here if needed
+    }
+  };
+
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null || touchStartTimeRef.current === null) {
+    if (touchStartXRef.current === null || 
+        touchStartYRef.current === null || 
+        touchStartTimeRef.current === null) {
       return;
     }
 
     const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
     const touchTime = Date.now() - touchStartTimeRef.current;
-    const touchDiff = touchStartXRef.current - touchEndX;
+    const touchDiffX = touchStartXRef.current - touchEndX;
+    const touchDiffY = Math.abs(touchStartYRef.current - touchEndY);
 
-    // Check if the touch was a swipe (fast enough and long enough distance)
-    if (touchTime < SWIPE_TIMEOUT && Math.abs(touchDiff) > SWIPE_THRESHOLD) {
+    // Only handle as swipe if more horizontal than vertical and meets thresholds
+    if (touchDiffY < 50 && touchTime < SWIPE_TIMEOUT && Math.abs(touchDiffX) > SWIPE_THRESHOLD) {
       if (!carouselActive) {
         // Activate carousel on first swipe
         setCarouselActive(true);
       } else {
         // Navigate through carousel based on swipe direction
-        if (touchDiff > 0) {
+        if (touchDiffX > 0) {
           // Swipe left - go to next
           setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
         } else {
@@ -162,6 +258,7 @@ const Crafted: React.FC = () => {
 
     // Reset touch refs
     touchStartXRef.current = null;
+    touchStartYRef.current = null;
     touchStartTimeRef.current = null;
   };
 
@@ -278,42 +375,62 @@ const Crafted: React.FC = () => {
           transition: { duration: 0.5 },
         }}>
         <AnimatePresence initial={false}>
-          {images.map((image, index) => (
-            <CarouselItem
-              key={image.alt}
-              initial={false}
-              animate={
-                carouselActive
-                  ? getImageProps(index)
-                  : {
-                      opacity: 0,
-                      x: 0,
-                      scale: 0.5,
-                      zIndex: -1,
-                    }
-              }
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 30,
-                opacity: { duration: 0.3 },
-              }}>
-              <StyledImage
-                src={image.src}
-                alt={image.alt}
-                style={{
-                  maxWidth: getImageSize(index === activeIndex),
-                }}
-                whileHover={carouselActive ? { scale: 1.05 } : undefined}
-              />
-            </CarouselItem>
-          ))}
+          {images.map((image, index) => {
+            // Calculate position relative to active image
+            const position = index - activeIndex;
+            
+            // Handle wraparound
+            let normalizedPosition = position;
+            if (position < -1) normalizedPosition += images.length;
+            if (position > 1) normalizedPosition -= images.length;
+            
+            // Only render the active image and immediate neighbors
+            const shouldRender = 
+              normalizedPosition === 0 || 
+              normalizedPosition === 1 || 
+              normalizedPosition === -1;
+              
+            if (!shouldRender) return null;
+            
+            return (
+              <CarouselItem
+                key={image.alt}
+                initial={false}
+                animate={
+                  carouselActive
+                    ? getImageProps(index)
+                    : {
+                        opacity: 0,
+                        x: 0,
+                        scale: 0.5,
+                        zIndex: -1,
+                      }
+                }
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  opacity: { duration: 0.3 },
+                }}>
+                <StyledImage
+                  src={image.src}
+                  alt={image.alt}
+                  style={{
+                    maxWidth: getImageSize(index === activeIndex),
+                  }}
+                  whileHover={carouselActive ? { scale: 1.05 } : undefined}
+                />
+              </CarouselItem>
+            );
+          })}
         </AnimatePresence>
       </CarouselContainer>
 
-      {/* Invisible surface to detect touch events */}
+      {/* Surface for horizontal scrolling and touch events */}
       <SwipeSurface
+        ref={swipeSurfaceRef}
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         carouselActive={carouselActive}
       />
