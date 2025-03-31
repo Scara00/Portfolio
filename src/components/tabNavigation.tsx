@@ -35,7 +35,7 @@ const TabContainer = styled(motion.div)<{
   border-radius: 1000px;
   border: ${(props) => (props.isContactSection ? "none" : "1px solid #bcbcbc")};
   backdrop-filter: ${(props) =>
-    props.isContactSection ? "blur(10px)" : "none"};
+    props.isContactSection ? "blur(7px)" : "none"};
   background: ${(props) =>
     props.isContactSection
       ? "rgba(255, 255, 255, 0.15)"
@@ -54,7 +54,7 @@ const IconContainer = styled(motion.a)<{
   justify-content: center;
   width: 24px;
   height: 24px;
-
+  transition: all 0.2s ease-in-out;
   &:hover {
     transform: scale(1.05)
       translateY(
