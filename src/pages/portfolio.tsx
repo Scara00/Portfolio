@@ -46,6 +46,14 @@ const ContainerTextPositionTime = styled.div<{ isMobile?: boolean }>`
   gap: 8px;
   align-items: center;
 `;
+const ContainerTextInfo = styled.div<{ isMobile?: boolean }>`
+  position: absolute;
+  bottom: ${(props) => (props.isMobile ? "10%" : "0")};
+  right: ${(props) => (props.isMobile ? "50%" : "0")};
+  transform: ${(props) => (props.isMobile ? "translateX(50%)" : "none")};
+  padding: ${(props) => (props.isMobile ? "10px 0px" : "50px 120px")};
+  text-align: center;
+`;
 
 const Portfolio: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>(
@@ -321,6 +329,15 @@ const Portfolio: React.FC = () => {
         <div className="chivo-mono">{location}</div>
         <div className="chivo-mono">{currentTime}</div>
       </ContainerTextPositionTime>
+      {activeSection === 0 && (
+        <ContainerTextInfo isMobile={isMobile}>
+          <div
+            className="chivo-mono"
+            style={{ fontSize: isMobile ? "12px" : "16px" }}>
+            Usa le frecce ↑, ↓ per navigare il portfolio.
+          </div>
+        </ContainerTextInfo>
+      )}
 
       <AnimatePresence mode="wait">{renderActiveSection()}</AnimatePresence>
 

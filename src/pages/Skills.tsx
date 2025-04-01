@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import ModalSkillView from "../view/modalSkillView";
 import { skillsMock } from "../utils/mock";
+import { X } from "lucide-react";
 
 const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
@@ -242,6 +243,7 @@ const Skills: React.FC = () => {
             transition={{ type: "spring", damping: 10 }}
             whileHover={{ scale: 1.2, zIndex: 10 }}
             onClick={() => handleIconClick(icon)}
+            onTap={() => handleIconClick(icon)}
             style={{
               width: icon.size,
               height: icon.size,
@@ -263,6 +265,7 @@ const Skills: React.FC = () => {
       <AnimatePresence>
         {showModal && (
           <Backdrop
+            onTap={closeModal}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -285,7 +288,6 @@ const Skills: React.FC = () => {
                 y: isMobile ? "100%" : 0,
               }}
               onClick={(e) => e.stopPropagation()}>
-              <CloseButton onClick={closeModal}>×</CloseButton>
               <ModalSkillView
                 title={selectedSkill?.name || ""}
                 description={selectedSkill?.description || ""}

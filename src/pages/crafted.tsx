@@ -182,7 +182,7 @@ const Crafted: React.FC = () => {
   // Calculate image size based on device
   const getImageSize = (isActive: boolean) => {
     if (isMobile) {
-      return isActive ? 150 : 100;
+      return isActive ? 300 : 200;
     } else if (isTablet) {
       return isActive ? 600 : 400;
     }
