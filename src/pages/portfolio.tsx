@@ -61,7 +61,7 @@ const Portfolio: React.FC = () => {
   );
   const [location, setLocation] = useState<string>("Milan, IT");
   const [activeSection, setActiveSection] = useState<number>(0);
-  const { isMobile } = useDeviceType();
+  const { isMobile, isDesktop } = useDeviceType();
 
   // Track touch start position
   const touchStartYRef = useRef<number | null>(null);
@@ -329,7 +329,7 @@ const Portfolio: React.FC = () => {
         <div className="chivo-mono">{location}</div>
         <div className="chivo-mono">{currentTime}</div>
       </ContainerTextPositionTime>
-      {activeSection === 0 && (
+      {activeSection === 0 && isDesktop && (
         <ContainerTextInfo isMobile={isMobile}>
           <div
             className="chivo-mono"
