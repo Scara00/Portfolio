@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import ModalSkillView from "../view/modalSkillView";
 import { skillsMock } from "../utils/mock";
-import { X } from "lucide-react";
 
 const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
@@ -82,17 +81,6 @@ const ModalContent = styled(motion.div)<{ isMobile: boolean }>`
   max-height: ${(props) => (props.isMobile ? "100%" : "80vh")};
   overflow: auto;
   z-index: 30;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: rgba(71, 99, 254, 1);
 `;
 
 // Generate a random number between min and max

@@ -72,35 +72,6 @@ const StyledImage = styled(motion.img)`
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
-// Indicators for pagination
-const PaginationContainer = styled.div`
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 20;
-`;
-
-// Touch surface for swipe detection with horizontal scroll
-const SwipeSurface = styled.div<{ carouselActive: boolean }>`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: ${(props) => (props.carouselActive ? 15 : 10)};
-  touch-action: pan-y; /* Allow vertical scrolling */
-  overflow-x: auto; /* Enable horizontal scrolling */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  scrollbar-width: none; /* Hide scrollbar Firefox */
-  -ms-overflow-scrolling: touch; /* Enable momentum scrolling in iOS */
-  &::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari/Opera */
-  }
-`;
-
 const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -376,16 +347,6 @@ const Crafted: React.FC = () => {
         transform: "translate(-30%, -30%)",
         zIndex: 3,
       };
-    }
-  };
-
-  // Handle pagination dot click
-  const handleDotClick = (index: number) => {
-    if (carouselActive) {
-      setActiveIndex(index);
-    } else {
-      setCarouselActive(true);
-      setActiveIndex(index);
     }
   };
 
