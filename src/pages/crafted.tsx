@@ -186,7 +186,10 @@ const Crafted: React.FC = () => {
       return;
     }
 
-    const currentScrollX = swipeSurfaceRef.current.scrollLeft;
+    const currentScrollX =
+      swipeSurfaceRef &&
+      swipeSurfaceRef.current &&
+      swipeSurfaceRef.current.scrollLeft;
 
     // Clear previous timeout
     if (scrollTimeoutRef.current) {
