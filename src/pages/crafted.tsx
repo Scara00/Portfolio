@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import HomePCA from "../assets/Home.png";
+import dettaglio from "../assets/dettaglio.png";
+import dashboard2 from "../assets/dashboard.png";
+import dob from "../assets/DOB.png";
+import docupload from "../assets/Docupload.png";
 import dashboard from "../assets/MacBook Pro 16_ - 94.png";
 import loginPCA from "../assets/LOGIN - LIGHT.png";
+import categorie from "../assets/categorie.png";
+import doc from "../assets/doc.png";
+import form from "../assets/form.png";
+import inclusione from "../assets/inclusione.png";
+import lista from "../assets/lista.png";
+import scelta from "../assets/scelta.png";
 import useDeviceType from "../hooks/useDeviceType";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -62,6 +72,17 @@ const StyledImage = styled(motion.img)`
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
+// Indicators for pagination
+const PaginationContainer = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+`;
+
 // Touch surface for swipe detection with horizontal scroll
 const SwipeSurface = styled.div<{ carouselActive: boolean }>`
   position: absolute;
@@ -101,20 +122,20 @@ const Crafted: React.FC = () => {
 
   // Array of images for the carousel
   const images = [
-    { src: dashboard, alt: "Dashboard" },
-    { src: loginPCA, alt: "Login" },
-    { src: HomePCA, alt: "Home" },
+    { src: loginPCA, alt: "login" },
+    { src: dettaglio, alt: "dettaglio" },
+    { src: dashboard2, alt: "dashboard" },
+    { src: dob, alt: "dob" },
+    { src: docupload, alt: "docupload" },
+    { src: HomePCA, alt: "home" },
+    { src: dashboard, alt: "dashboard-1" },
+    { src: categorie, alt: "categorie" },
+    { src: doc, alt: "doc" },
+    { src: form, alt: "form" },
+    { src: inclusione, alt: "inclusione" },
+    { src: lista, alt: "lista" },
+    { src: scelta, alt: "scelta" },
   ];
-
-  // Calculate image size based on device
-  const getImageSize = (isActive: boolean) => {
-    if (isMobile) {
-      return isActive ? 150 : 100;
-    } else if (isTablet) {
-      return isActive ? 300 : 200;
-    }
-    return isActive ? 500 : 350;
-  };
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -148,55 +169,6 @@ const Crafted: React.FC = () => {
     const swipeSurface = swipeSurfaceRef.current;
     if (!swipeSurface) return;
 
-    const handleScroll = () => {
-      if (!carouselActive) {
-        // Activate carousel on first horizontal scroll
-        setCarouselActive(true);
-        return;
-      }
-
-      const currentScrollX = swipeSurface.scrollLeft;
-
-      // Clear previous timeout
-      if (scrollTimeoutRef.current) {
-        window.clearTimeout(scrollTimeoutRef.current);
-      }
-
-      // Set a timeout to detect when scrolling stops
-      scrollTimeoutRef.current = window.setTimeout(() => {
-        // Determine scroll direction
-        if (Math.abs(currentScrollX - lastScrollXRef.current) > 10) {
-          const scrollRight = currentScrollX > lastScrollXRef.current;
-
-          // Update image index based on scroll direction
-          if (scrollRight) {
-            // Scrolled right, show previous image
-            setActiveIndex((prev) =>
-              prev === 0 ? images.length - 1 : prev - 1
-            );
-          } else {
-            // Scrolled left, show next image
-            setActiveIndex((prev) =>
-              prev === images.length - 1 ? 0 : prev + 1
-            );
-          }
-        }
-
-        // Reset scroll position (with a small delay to avoid visual glitches)
-        setTimeout(() => {
-          if (swipeSurface) {
-            swipeSurface.scrollTo({
-              left: 0,
-              behavior: "auto",
-            });
-          }
-          lastScrollXRef.current = 0;
-        }, 50);
-      }, SCROLL_DELAY);
-
-      lastScrollXRef.current = currentScrollX;
-    };
-
     swipeSurface.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -206,6 +178,61 @@ const Crafted: React.FC = () => {
       }
     };
   }, [carouselActive, images.length]);
+
+  // Calculate image size based on device
+  const getImageSize = (isActive: boolean) => {
+    if (isMobile) {
+      return isActive ? 150 : 100;
+    } else if (isTablet) {
+      return isActive ? 600 : 400;
+    }
+    return isActive ? 900 : 500;
+  };
+
+  const handleScroll = () => {
+    if (!carouselActive) {
+      // Activate carousel on first horizontal scroll
+      setCarouselActive(true);
+      return;
+    }
+
+    const currentScrollX = swipeSurface.scrollLeft;
+
+    // Clear previous timeout
+    if (scrollTimeoutRef.current) {
+      window.clearTimeout(scrollTimeoutRef.current);
+    }
+
+    // Set a timeout to detect when scrolling stops
+    scrollTimeoutRef.current = window.setTimeout(() => {
+      // Determine scroll direction
+      if (Math.abs(currentScrollX - lastScrollXRef.current) > 10) {
+        const scrollRight = currentScrollX > lastScrollXRef.current;
+
+        // Update image index based on scroll direction
+        if (scrollRight) {
+          // Scrolled right, show previous image
+          setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+        } else {
+          // Scrolled left, show next image
+          setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+        }
+      }
+
+      // Reset scroll position (with a small delay to avoid visual glitches)
+      setTimeout(() => {
+        if (swipeSurface) {
+          swipeSurface.scrollTo({
+            left: 0,
+            behavior: "auto",
+          });
+        }
+        lastScrollXRef.current = 0;
+      }, 50);
+    }, SCROLL_DELAY);
+
+    lastScrollXRef.current = currentScrollX;
+  };
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -284,7 +311,7 @@ const Crafted: React.FC = () => {
 
     // Calculate X offset based on position
     const xOffset =
-      normalizedPosition * (isMobile ? 120 : isTablet ? 250 : 400);
+      normalizedPosition * (isMobile ? 120 : isTablet ? 600 : 850);
 
     // Active item is centered, larger, fully opaque, in front
     // Other items are offset left/right, smaller, semi-transparent, behind
@@ -302,31 +329,63 @@ const Crafted: React.FC = () => {
     };
   };
 
+  // Get the initial stacked images (now supports more than 3)
+  const getInitialStackedImages = () => {
+    // We'll show a maximum of 3 images initially in the stack
+    const initialImages = images.slice(0, Math.min(3, images.length));
+
+    return initialImages.map((image, index) => (
+      <InitialImage
+        key={`initial-${image.alt}`}
+        src={image.src}
+        alt={image.alt}
+        style={{
+          ...getInitialPosition(index),
+        }}
+        animate={{ opacity: 1 }}
+        exit={{
+          opacity: 0,
+          transition: { duration: 0.3 },
+        }}
+      />
+    ));
+  };
+
   // Initial diagonal positions for the stacked images
   const getInitialPosition = (index: number) => {
     // First image: more to top-left
     if (index === 0) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "300px" : "600px",
-        transform: "translate(-80%, -80%)",
+        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
+        transform: "translate(-70%, -70%)",
         zIndex: 1,
       };
     }
     // Second image: middle
     else if (index === 1) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "300px" : "600px",
-        transform: "translate(-40%, -40%)",
+        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
+        transform: "translate(-50%, -50%)",
         zIndex: 2,
       };
     }
     // Third image: more to bottom-right
     else {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "300px" : "600px",
-        transform: "translate(-20%, -20%)",
+        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
+        transform: "translate(-30%, -30%)",
         zIndex: 3,
       };
+    }
+  };
+
+  // Handle pagination dot click
+  const handleDotClick = (index: number) => {
+    if (carouselActive) {
+      setActiveIndex(index);
+    } else {
+      setCarouselActive(true);
+      setActiveIndex(index);
     }
   };
 
@@ -352,25 +411,7 @@ const Crafted: React.FC = () => {
 
       {/* Initial diagonal images when carousel is not active */}
       <AnimatePresence>
-        {!carouselActive && (
-          <>
-            {images.map((image, index) => (
-              <InitialImage
-                key={`initial-${image.alt}`}
-                src={image.src}
-                alt={image.alt}
-                style={{
-                  ...getInitialPosition(index),
-                }}
-                animate={{ opacity: 1 }}
-                exit={{
-                  opacity: 0,
-                  transition: { duration: 0.3 },
-                }}
-              />
-            ))}
-          </>
-        )}
+        {!carouselActive && <>{getInitialStackedImages()}</>}
       </AnimatePresence>
 
       {/* Carousel that appears when activated */}
@@ -401,7 +442,7 @@ const Crafted: React.FC = () => {
 
             return (
               <CarouselItem
-                key={image.alt}
+                key={`carousel-${image.alt}`}
                 initial={false}
                 animate={
                   carouselActive
