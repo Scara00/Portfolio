@@ -192,7 +192,7 @@ const Crafted: React.FC = () => {
 
       // Reset scroll position (with a small delay to avoid visual glitches)
       setTimeout(() => {
-        if (swipeSurface) {
+        if (swipeSurfaceRef.current) {
           swipeSurface.scrollTo({
             left: 0,
             behavior: "auto",
