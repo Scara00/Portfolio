@@ -45,6 +45,7 @@ const TabContainer = styled(motion.div)<{
     props.isContactSection ? "0 4px 4px rgba(31, 38, 135, 0.1)" : "none"};
 `;
 
+// Fix: Changed from motion.image to motion.a (anchor)
 const IconContainer = styled(motion.a)<{
   isContactSection?: boolean;
   isMobile: boolean;
@@ -56,6 +57,7 @@ const IconContainer = styled(motion.a)<{
   width: 24px;
   height: 24px;
   transition: all 0.2s ease-in-out;
+  text-decoration: none; /* Remove default link styling */
   &:hover {
     transform: scale(1.05)
       translateY(
@@ -135,6 +137,17 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
                 key={index}
                 isContactSection={isContactSection}
                 isMobile={isMobile}
+                onTap={() => {
+                  window.open(
+                    index === 0
+                      ? `mailto:${emailAddress}?subject=Contatto dal Portfolio`
+                      : index === 1
+                      ? "https://www.linkedin.com/in/cristian-scaratti-22120b157/"
+                      : index === 2
+                      ? "https://www.threads.net/@cristian_scaratti?igshid=NTc4MTIwNjQ2YQ=="
+                      : "https://github.com/Scara00/Portfolio"
+                  );
+                }}
                 href={
                   index === 0
                     ? `mailto:${emailAddress}?subject=Contatto dal Portfolio`
