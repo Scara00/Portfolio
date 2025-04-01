@@ -72,6 +72,25 @@ const StyledImage = styled(motion.img)`
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
+// Touch surface for swipe detection with horizontal scroll
+const SwipeSurface = styled.div<{ carouselActive: boolean }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: ${(props) => (props.carouselActive ? 15 : 10)};
+  touch-action: pan-x; /* Only allow horizontal scrolling */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden; /* Disable vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  -ms-overflow-scrolling: touch; /* Enable momentum scrolling in iOS */
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari/Opera */
+  }
+`;
+
 const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -207,25 +226,36 @@ const Crafted: React.FC = () => {
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Stop propagation to prevent the parent scroll handler from activating
+    e.stopPropagation();
+
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
     touchStartTimeRef.current = Date.now();
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // Handle touch move if needed
-    if (
-      touchStartXRef.current !== null &&
-      touchStartYRef.current !== null &&
-      Math.abs(e.touches[0].clientX - touchStartXRef.current) >
-        Math.abs(e.touches[0].clientY - touchStartYRef.current) * 2
-    ) {
-      // If horizontal movement is significantly more than vertical
-      // We could add additional logic here if needed
+    if (touchStartXRef.current === null || touchStartYRef.current === null) {
+      return;
+    }
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+
+    const diffX = Math.abs(currentX - touchStartXRef.current);
+    const diffY = Math.abs(currentY - touchStartYRef.current);
+
+    // If clearly horizontal movement, prevent default to stop vertical scrolling
+    if (diffX > diffY && diffX > 10) {
+      e.preventDefault();
+      e.stopPropagation();
     }
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    // Stop propagation to prevent the parent scroll handler from activating
+    e.stopPropagation();
+
     if (
       touchStartXRef.current === null ||
       touchStartYRef.current === null ||
