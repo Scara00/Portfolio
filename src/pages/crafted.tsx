@@ -167,7 +167,7 @@ const Crafted: React.FC = () => {
       return;
     }
 
-    const currentScrollX = swipeSurface.scrollLeft;
+    const currentScrollX = swipeSurfaceRef.current.scrollLeft;
 
     // Clear previous timeout
     if (scrollTimeoutRef.current) {
@@ -193,7 +193,7 @@ const Crafted: React.FC = () => {
       // Reset scroll position (with a small delay to avoid visual glitches)
       setTimeout(() => {
         if (swipeSurfaceRef.current) {
-          swipeSurface.scrollTo({
+          swipeSurfaceRef.current.scrollTo({
             left: 0,
             behavior: "auto",
           });
