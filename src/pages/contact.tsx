@@ -6,7 +6,7 @@ const TextName = styled.div<{ isMobile?: boolean }>`
   position: relative;
   color: rgba(71, 99, 254, 1);
   z-index: 4;
-  animation: backInDown 1s ease-in-out forwards;
+  animation: backInDown 0.8s ease-in-out forwards;
   @keyframes backInDown {
     0% {
       transform: translateY(-100vh) scale(0.3);
@@ -33,7 +33,6 @@ const Contact: React.FC = () => {
         style={{ fontSize: isMobile ? "70px" : isTablet ? "150px" : "280px" }}>
         LET'S KEEP IN TOUCH
       </TextName>
-      {/* Add your contact content here */}
     </>
   );
 };

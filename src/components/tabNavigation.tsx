@@ -56,7 +56,7 @@ const IconContainer = styled(motion.a)<{
   justify-content: center;
   width: 24px;
   height: 24px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.8s ease-in-out;
   text-decoration: none; /* Remove default link styling */
   &:hover {
     transform: scale(1.05)
