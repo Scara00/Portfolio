@@ -217,6 +217,9 @@ const Crafted: React.FC = () => {
   return (
     <>
       <TextName
+        onPanStart={(e) => {
+          debugger;
+        }}
         className="agera-mono"
         style={{
           fontSize: isMobile ? "70px" : isTablet ? "200px" : "280px",

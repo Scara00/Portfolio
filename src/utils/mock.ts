@@ -7,6 +7,13 @@ import javascriptIcon from "../assets/icons/javascript-svgrepo-com.svg";
 import react from "../assets/icons/react-svgrepo-com.svg";
 import ts from "../assets/icons/typescript-official-svgrepo-com.svg";
 import figma from "../assets/icons/figma-svgrepo-com.svg";
+import zeroheight from "../assets/icons/zeroheight.svg";
+import n8n from "../assets/icons/n8n.png";
+import supabase from "../assets/icons/supabase.png";
+
+import css from "../assets/icons/css.png";
+import html from "../assets/icons/html.svg";
+import storybook from "../assets/icons/storybook.svg";
 
 export const skillsMock = [
     {
@@ -68,6 +75,47 @@ export const skillsMock = [
         id: 8,
         name: "Figma",
         icon: figma,
+        description: "",
+        percentageSkill: 90,
+    },
+    {
+        id: 9,
+        name: "N8N",
+        icon: n8n,
+        description: "",
+        percentageSkill: 90,
+    },
+    {
+        id: 10,
+        name: "zeroheight",
+        icon: zeroheight,
+        description: "",
+        percentageSkill: 90,
+    }, {
+        id: 11,
+        name: "Supabase",
+        icon: supabase,
+        description: "",
+        percentageSkill: 90,
+    },
+    {
+        id: 12,
+        name: "HTML",
+        icon: html,
+        description: "",
+        percentageSkill: 90,
+    },
+    {
+        id: 13,
+        name: "CSS",
+        icon: css,
+        description: "",
+        percentageSkill: 90,
+    },
+    {
+        id: 14,
+        name: "Storybook",
+        icon: storybook,
         description: "",
         percentageSkill: 90,
     },

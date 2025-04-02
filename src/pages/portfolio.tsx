@@ -338,6 +338,15 @@ const Portfolio: React.FC = () => {
           </div>
         </ContainerTextInfo>
       )}
+      {activeSection === 1 && isDesktop && (
+        <ContainerTextInfo isMobile={isMobile}>
+          <div
+            className="chivo-mono"
+            style={{ fontSize: isMobile ? "12px" : "16px" }}>
+            Usa la freccia → per vedere alcuni miei lavori.
+          </div>
+        </ContainerTextInfo>
+      )}
 
       <AnimatePresence mode="wait">{renderActiveSection()}</AnimatePresence>
 

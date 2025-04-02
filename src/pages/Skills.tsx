@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import useDeviceType from "../hooks/useDeviceType";
-import { motion, AnimatePresence } from "framer-motion";
-// Import your icons
-
-import ModalSkillView from "../view/modalSkillView";
+import { motion } from "framer-motion";
 import { skillsMock } from "../utils/mock";
 
 const TextName = styled.div<{ isMobile?: boolean }>`
@@ -55,43 +52,14 @@ const BouncingIcon = styled(motion.div)`
   }
 `;
 
-// Modal Components
-const Backdrop = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ModalContent = styled(motion.div)<{ isMobile: boolean }>`
-  background: white;
-  border-radius: ${(props) => (props.isMobile ? "0" : "12px")};
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  position: relative;
-  width: ${(props) => (props.isMobile ? "100%" : "500px")};
-  height: ${(props) => (props.isMobile ? "100%" : "auto")};
-  max-width: 90%;
-  max-height: ${(props) => (props.isMobile ? "100%" : "80vh")};
-  overflow: auto;
-  z-index: 30;
-`;
-
 // Generate a random number between min and max
 const random = (min: number, max: number) => Math.random() * (max - min) + min;
-const skills = skillsMock;
 
 const Skills: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [containerSize, setContainerSize] = useState({
-    width: 1000,
-    height: 800,
+    width: window.innerWidth,
+    height: window.innerHeight,
   });
   const [bouncingIcons, setBouncingIcons] = useState<
     Array<{
@@ -106,14 +74,8 @@ const Skills: React.FC = () => {
     }>
   >([]);
 
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState<(typeof skills)[0] | null>(
-    null
-  );
-
   // Calculate icon size based on device
-  const iconSize = isMobile ? 40 : isTablet ? 50 : 80;
+  const iconSize = isMobile ? 40 : isTablet ? 60 : 70;
 
   // Setup container dimensions and initial icon positions
   useEffect(() => {
@@ -124,43 +86,23 @@ const Skills: React.FC = () => {
   }, [iconSize]);
 
   const updateSize = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    setContainerSize({ width, height });
-
-    // Initialize icons with random positions and velocities
-    const newBouncingIcons = skills.map((skill) => {
-      return {
-        id: skill.id,
-        x: random(iconSize, width - iconSize),
-        y: random(iconSize, height - iconSize),
-        velocityX: random(-3, 3), // Moderate speed
-        velocityY: random(-3, 3), // Moderate speed
-        size: iconSize,
-        icon: skill.icon,
-        name: skill.name,
-      };
-    });
-
+    setContainerSize({ width: window.innerWidth, height: window.innerHeight });
     setBouncingIcons(newBouncingIcons);
   };
 
-  // Handle icon click - open modal
-  const handleIconClick = (icon: (typeof bouncingIcons)[0]) => {
-    setSelectedSkill(skills.find((skill) => skill.id === icon.id) || null);
-    setShowModal(true);
-
-    // Pause animation when modal is open
-    // This could be implemented by checking showModal in the animate function
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedSkill(null);
-  };
-
+  // Initialize icons with random positions and velocities
+  const newBouncingIcons = skillsMock.map((skill) => {
+    return {
+      id: skill.id,
+      x: random(iconSize, window.innerWidth - iconSize),
+      y: random(iconSize, window.innerHeight - iconSize),
+      velocityX: random(-3, 3), // Moderate speed
+      velocityY: random(-3, 3), // Moderate speed
+      size: iconSize,
+      icon: skill.icon,
+      name: skill.name,
+    };
+  });
   // Animation loop for bouncing effect
   useEffect(() => {
     if (bouncingIcons.length === 0) return;
@@ -171,29 +113,30 @@ const Skills: React.FC = () => {
   }, [bouncingIcons.length, containerSize]);
 
   const animate = () => {
-    // Skip animation if modal is open
-    if (showModal) {
-      requestAnimationFrame(animate);
-      return;
-    }
-
     setBouncingIcons((prevIcons) => {
-      return prevIcons.map((icon) => {
+      // First, move all icons based on their velocity
+      const movedIcons = prevIcons.map((icon) => {
         let newX = icon.x + icon.velocityX;
         let newY = icon.y + icon.velocityY;
         let newVelocityX = icon.velocityX;
         let newVelocityY = icon.velocityY;
 
         // Bounce off right/left edges
-        if (newX + icon.size > containerSize.width || newX < 0) {
-          newVelocityX = -newVelocityX;
-          newX = newX < 0 ? 0 : containerSize.width - icon.size;
+        if (newX + icon.size >= containerSize.width) {
+          newVelocityX = -Math.abs(newVelocityX);
+          newX = containerSize.width - icon.size;
+        } else if (newX <= 0) {
+          newVelocityX = Math.abs(newVelocityX);
+          newX = 0;
         }
 
         // Bounce off bottom/top edges
-        if (newY + icon.size > containerSize.height || newY < 0) {
-          newVelocityY = -newVelocityY;
-          newY = newY < 0 ? 0 : containerSize.height - icon.size;
+        if (newY + icon.size >= containerSize.height) {
+          newVelocityY = -Math.abs(newVelocityY);
+          newY = containerSize.height - icon.size;
+        } else if (newY <= 0) {
+          newVelocityY = Math.abs(newVelocityY);
+          newY = 0;
         }
 
         return {
@@ -204,6 +147,95 @@ const Skills: React.FC = () => {
           velocityY: newVelocityY,
         };
       });
+
+      // Then check for collisions between icons
+      const collidedIcons = [...movedIcons];
+
+      // Check each pair of icons for collision
+      for (let i = 0; i < collidedIcons.length; i++) {
+        for (let j = i + 1; j < collidedIcons.length; j++) {
+          const icon1 = collidedIcons[i];
+          const icon2 = collidedIcons[j];
+
+          // Calculate centers
+          const center1 = {
+            x: icon1.x + icon1.size / 2,
+            y: icon1.y + icon1.size / 2,
+          };
+
+          const center2 = {
+            x: icon2.x + icon2.size / 2,
+            y: icon2.y + icon2.size / 2,
+          };
+
+          // Calculate distance between centers
+          const dx = center2.x - center1.x;
+          const dy = center2.y - center1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          // Sum of radii
+          const minDistance = (icon1.size + icon2.size) / 2;
+
+          // Check if colliding
+          if (distance < minDistance) {
+            // Calculate collision angle
+            const angle = Math.atan2(dy, dx);
+
+            // Calculate velocity magnitudes before collision
+            const mag1 = Math.sqrt(
+              icon1.velocityX * icon1.velocityX +
+                icon1.velocityY * icon1.velocityY
+            );
+            const mag2 = Math.sqrt(
+              icon2.velocityX * icon2.velocityX +
+                icon2.velocityY * icon2.velocityY
+            );
+
+            // Calculate direction angles
+            const dir1 = Math.atan2(icon1.velocityY, icon1.velocityX);
+            const dir2 = Math.atan2(icon2.velocityY, icon2.velocityX);
+
+            // Calculate new velocity components
+            // Using simplified physics for elastic collision
+            const newVelX1 =
+              mag2 * Math.cos(dir2 - angle) * Math.cos(angle) +
+              mag1 * Math.sin(dir1 - angle) * Math.cos(angle + Math.PI / 2);
+            const newVelY1 =
+              mag2 * Math.cos(dir2 - angle) * Math.sin(angle) +
+              mag1 * Math.sin(dir1 - angle) * Math.sin(angle + Math.PI / 2);
+
+            const newVelX2 =
+              mag1 * Math.cos(dir1 - angle) * Math.cos(angle) +
+              mag2 * Math.sin(dir2 - angle) * Math.cos(angle + Math.PI / 2);
+            const newVelY2 =
+              mag1 * Math.cos(dir1 - angle) * Math.sin(angle) +
+              mag2 * Math.sin(dir2 - angle) * Math.sin(angle + Math.PI / 2);
+
+            // Prevent overlap by pushing icons apart
+            const overlap = minDistance - distance;
+            const pushX = overlap * Math.cos(angle) * 0.5; // Half the overlap distance
+            const pushY = overlap * Math.sin(angle) * 0.5;
+
+            collidedIcons[i] = {
+              ...icon1,
+              velocityX: newVelX1,
+              velocityY: newVelY1,
+              x: icon1.x - pushX, // Move icon1 away from icon2
+              y: icon1.y - pushY,
+            };
+
+            collidedIcons[j] = {
+              ...icon2,
+              velocityX: newVelX2,
+              velocityY: newVelY2,
+              x: icon2.x + pushX, // Move icon2 away from icon1
+              y: icon2.y + pushY,
+            };
+          }
+        }
+      }
+
+      return collidedIcons;
     });
 
     requestAnimationFrame(animate);
@@ -230,8 +262,6 @@ const Skills: React.FC = () => {
             }}
             transition={{ type: "spring", damping: 10 }}
             whileHover={{ scale: 1.2, zIndex: 10 }}
-            onClick={() => handleIconClick(icon)}
-            onTap={() => handleIconClick(icon)}
             style={{
               width: icon.size,
               height: icon.size,
@@ -248,44 +278,6 @@ const Skills: React.FC = () => {
           </BouncingIcon>
         ))}
       </IconsContainer>
-
-      {/* Modal with AnimatePresence for smooth enter/exit animations */}
-      <AnimatePresence>
-        {showModal && (
-          <Backdrop
-            onTap={closeModal}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeModal}>
-            <ModalContent
-              isMobile={isMobile}
-              initial={{
-                opacity: 0,
-                scale: isMobile ? 1 : 0.8,
-                y: isMobile ? "100%" : 0,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                scale: isMobile ? 1 : 0.8,
-                y: isMobile ? "100%" : 0,
-              }}
-              onClick={(e) => e.stopPropagation()}>
-              <ModalSkillView
-                title={selectedSkill?.name || ""}
-                description={selectedSkill?.description || ""}
-                percentageSkill={
-                  selectedSkill?.percentageSkill || 0
-                }></ModalSkillView>
-            </ModalContent>
-          </Backdrop>
-        )}
-      </AnimatePresence>
     </>
   );
 };
