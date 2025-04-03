@@ -225,6 +225,8 @@ const Crafted: React.FC = () => {
         }}
         animate={{
           scale: carouselActive ? 0.9 : 1,
+          opacity: carouselActive ? 0.7 : 1,
+          filter: carouselActive ? "blur(2px)" : "none",
           zIndex: carouselActive ? 2 : 4,
         }}
         transition={{
