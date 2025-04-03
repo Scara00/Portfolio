@@ -56,7 +56,7 @@ const IconContainer = styled(motion.a)<{
   justify-content: center;
   width: 24px;
   height: 24px;
-  transition: all 0.8s ease-in-out;
+  transition: all 0.5s ease-in-out;
   text-decoration: none; /* Remove default link styling */
   &:hover {
     transform: scale(1.05)
@@ -80,7 +80,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeSection = 0 }) => {
   const { isMobile } = useDeviceType();
 
   // Check if we're on the Contact section
-  const isContactSection = activeSection === 3;
+  const isContactSection = activeSection === 4;
 
   // Email address
   const emailAddress = "cristian.scaratti00@gmail.com";

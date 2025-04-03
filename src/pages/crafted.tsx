@@ -68,7 +68,7 @@ const CarouselItem = styled(motion.div)`
 
 const StyledImage = styled(motion.img)`
   height: auto;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
@@ -94,25 +94,24 @@ const Crafted: React.FC = () => {
     { src: scelta, alt: "scelta" },
   ];
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // Activate carousel on first arrow press if not already active
+    if (!carouselActive) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        setCarouselActive(true);
+      }
+      return;
+    }
+
+    // Navigate through carousel
+    if (e.key === "ArrowRight") {
+      setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    } else if (e.key === "ArrowLeft") {
+      setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+  };
   // Handle keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Activate carousel on first arrow press if not already active
-      if (!carouselActive) {
-        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-          setCarouselActive(true);
-        }
-        return;
-      }
-
-      // Navigate through carousel
-      if (e.key === "ArrowRight") {
-        setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-      } else if (e.key === "ArrowLeft") {
-        setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-      }
-    };
-
     window.addEventListener("keydown", handleKeyDown);
 
     // Clean up event listener
@@ -128,7 +127,7 @@ const Crafted: React.FC = () => {
     } else if (isTablet) {
       return isActive ? 600 : 400;
     }
-    return isActive ? 900 : 500;
+    return isActive ? 900 : 700;
   };
 
   // Calculate positions for each image based on active index
@@ -217,6 +216,8 @@ const Crafted: React.FC = () => {
   return (
     <>
       <TextName
+        onClick={() => setCarouselActive(true)}
+        onTap={() => setCarouselActive(true)}
         className="agera-mono"
         style={{
           fontSize: isMobile ? "70px" : isTablet ? "200px" : "280px",
@@ -224,8 +225,6 @@ const Crafted: React.FC = () => {
         }}
         animate={{
           scale: carouselActive ? 0.9 : 1,
-          opacity: carouselActive ? 0.7 : 1,
-          filter: carouselActive ? "blur(2px)" : "none",
           zIndex: carouselActive ? 2 : 4,
         }}
         transition={{

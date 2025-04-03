@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import Contact from "./contact";
 import Skills from "./Skills";
+import CraftedMobile from "./crafted_mobile";
 
 const Container = styled.div`
   height: 100dvh;
@@ -82,8 +83,10 @@ const Portfolio: React.FC = () => {
       case 1:
         return "CRAFTED";
       case 2:
-        return "SKILLS";
+        return "CRAFTED MOBILE";
       case 3:
+        return "SKILLS";
+      case 4:
         return "CONTACT";
       default:
         return "HOME";
@@ -165,7 +168,7 @@ const Portfolio: React.FC = () => {
 
     // Ensure we stay within bounds
     if (newSection < 0) newSection = 0;
-    if (newSection > 3) newSection = 3;
+    if (newSection > 4) newSection = 4;
 
     // Only change if different
     if (newSection !== currentSection) {
@@ -247,7 +250,7 @@ const Portfolio: React.FC = () => {
       changeSection(direction);
     }
     // Direct navigation with number keys
-    else if (e.key >= "1" && e.key <= "4") {
+    else if (e.key >= "1" && e.key <= "5") {
       const targetSection = parseInt(e.key) - 1;
       if (targetSection !== activeSectionRef.current) {
         const now = Date.now();
@@ -294,6 +297,17 @@ const Portfolio: React.FC = () => {
       case 2:
         return (
           <motion.div
+            key="crafed-mobile"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.4 }}>
+            <CraftedMobile />
+          </motion.div>
+        );
+      case 3:
+        return (
+          <motion.div
             key="skills"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -302,7 +316,7 @@ const Portfolio: React.FC = () => {
             <Skills />
           </motion.div>
         );
-      case 3:
+      case 4:
         return (
           <motion.div
             key="contact"
