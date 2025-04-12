@@ -11,7 +11,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Contact from "./contact";
 import Skills from "./Skills";
 import CraftedMobile from "./crafted_mobile";
-import { CursorePersonalizzato } from "../components/customCursor";
 
 const Container = styled.div`
   height: 100dvh;

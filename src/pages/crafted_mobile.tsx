@@ -70,6 +70,7 @@ const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [carouselActive, setCarouselActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -178,8 +179,10 @@ const Crafted: React.FC = () => {
 
     if (info.offset.x < -threshold) {
       handleNext();
+      return e;
     } else if (info.offset.x > threshold) {
       handlePrev();
+      return e;
     }
   };
 
