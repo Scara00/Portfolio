@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import HomePCA from "../assets/Home.png";
 import dettaglio from "../assets/dettaglio.png";
@@ -14,12 +14,12 @@ import inclusione from "../assets/inclusione.png";
 import lista from "../assets/lista.png";
 import scelta from "../assets/scelta.png";
 import useDeviceType from "../hooks/useDeviceType";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
 const TextName = styled(motion.div)<{ isMobile?: boolean }>`
   position: relative;
   color: rgba(71, 99, 254, 1);
-  z-index: 4; /* Text above the initial diagonal images */
+  z-index: 4;
   animation: backInDown 1s ease-in-out forwards;
   @keyframes backInDown {
     0% {
@@ -55,7 +55,7 @@ const CarouselContainer = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5; /* Carousel above everything when active */
+  z-index: 5;
 `;
 
 const CarouselItem = styled(motion.div)`
@@ -74,10 +74,12 @@ const StyledImage = styled(motion.img)`
 
 const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
-  const [activeIndex, setActiveIndex] = useState(0);
   const [carouselActive, setCarouselActive] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Array of images for the carousel
   const images = [
     { src: loginPCA, alt: "login" },
     { src: dettaglio, alt: "dettaglio" },
@@ -94,78 +96,7 @@ const Crafted: React.FC = () => {
     { src: scelta, alt: "scelta" },
   ];
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    // Activate carousel on first arrow press if not already active
-    if (!carouselActive) {
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-        setCarouselActive(true);
-      }
-      return;
-    }
-
-    // Navigate through carousel
-    if (e.key === "ArrowRight") {
-      setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    } else if (e.key === "ArrowLeft") {
-      setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    }
-  };
-  // Handle keyboard navigation
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-
-    // Clean up event listener
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [carouselActive, images.length]);
-
-  // Calculate image size based on device
-  const getImageSize = (isActive: boolean) => {
-    if (isMobile) {
-      return isActive ? 300 : 200;
-    } else if (isTablet) {
-      return isActive ? 600 : 400;
-    }
-    return isActive ? 900 : 700;
-  };
-
-  // Calculate positions for each image based on active index
-  const getImageProps = (index: number) => {
-    // Calculate position relative to active image (-1, 0, 1)
-    const position = index - activeIndex;
-
-    // Handle wraparound (e.g., last image appears on left of first image)
-    const normalizedPosition =
-      position < -1
-        ? position + images.length
-        : position > 1
-        ? position - images.length
-        : position;
-
-    // Calculate X offset based on position
-    const xOffset =
-      normalizedPosition * (isMobile ? 120 : isTablet ? 600 : 850);
-
-    // Active item is centered, larger, fully opaque, in front
-    // Other items are offset left/right, smaller, semi-transparent, behind
-    const isActive = position === 0;
-    const zIndex = isActive ? 10 : 5;
-    const opacity = isActive ? 1 : 0.6;
-    const scale = isActive ? 1 : 0.85;
-
-    return {
-      x: xOffset,
-      opacity,
-      zIndex,
-      scale,
-      maxWidth: getImageSize(isActive),
-    };
-  };
-
-  // Get the initial stacked images (now supports more than 3)
   const getInitialStackedImages = () => {
-    // We'll show a maximum of 3 images initially in the stack
     const initialImages = images.slice(0, Math.min(3, images.length));
 
     return initialImages.map((image, index) => (
@@ -181,36 +112,149 @@ const Crafted: React.FC = () => {
           opacity: 0,
           transition: { duration: 0.3 },
         }}
+        onClick={() => setCarouselActive(true)}
       />
     ));
   };
 
-  // Initial diagonal positions for the stacked images
   const getInitialPosition = (index: number) => {
-    // First image: more to top-left
     if (index === 0) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
-        transform: "translate(-70%, -70%)",
+        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
+        transform: "translate(-80%, -50%)",
         zIndex: 1,
       };
-    }
-    // Second image: middle
-    else if (index === 1) {
+    } else if (index === 1) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
+        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
         transform: "translate(-50%, -50%)",
         zIndex: 2,
       };
-    }
-    // Third image: more to bottom-right
-    else {
+    } else {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "450px" : "550px",
-        transform: "translate(-30%, -30%)",
+        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
+        transform: "translate(-20%, -50%)",
         zIndex: 3,
       };
     }
+  };
+
+  const handleNext = () => {
+    setDirection(1);
+    setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrev = () => {
+    setDirection(-1);
+    setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!carouselActive) return;
+
+    e.preventDefault();
+
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    const threshold = 20;
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (
+        Math.abs(e.deltaX) > Math.abs(e.deltaY) &&
+        Math.abs(e.deltaX) > threshold
+      ) {
+        if (e.deltaX > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      } else if (Math.abs(e.deltaY) > threshold) {
+        if (e.deltaY > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    }, 100);
+  };
+
+  const handleDragEnd = (
+    e: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    const threshold = isMobile ? 50 : 100;
+
+    if (info.offset.x < -threshold) {
+      handleNext();
+    } else if (info.offset.x > threshold) {
+      handlePrev();
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!carouselActive) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        setCarouselActive(true);
+      }
+      return;
+    }
+
+    if (e.key === "ArrowRight") {
+      handleNext();
+    } else if (e.key === "ArrowLeft") {
+      handlePrev();
+    } else if (e.key === "Escape") {
+      setCarouselActive(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [carouselActive, images.length]);
+
+  const getImageSize = (isActive: boolean) => {
+    if (isMobile) {
+      return isActive ? 200 : 80;
+    } else if (isTablet) {
+      return isActive ? 500 : 300;
+    }
+    return isActive ? 800 : 500;
+  };
+
+  const getImageProps = (index: number) => {
+    const position = index - activeIndex;
+
+    const normalizedPosition =
+      position < -1
+        ? position + images.length
+        : position > 1
+        ? position - images.length
+        : position;
+
+    const xOffset =
+      normalizedPosition * (isMobile ? 120 : isTablet ? 600 : 850);
+
+    const isActive = position === 0;
+    const zIndex = isActive ? 10 : 6;
+    const opacity = isActive ? 1 : 0.8;
+    const scale = isActive ? 1 : 0.85;
+
+    return {
+      x: xOffset,
+      opacity,
+      zIndex,
+      scale,
+      maxWidth: getImageSize(isActive),
+    };
   };
 
   return (
@@ -224,10 +268,8 @@ const Crafted: React.FC = () => {
           textAlign: "center",
         }}
         animate={{
-          scale: carouselActive ? 0.9 : 1,
-          opacity: carouselActive ? 0.7 : 1,
-          filter: carouselActive ? "blur(2px)" : "none",
-          zIndex: carouselActive ? 2 : 4,
+          scale: carouselActive ? 0.8 : 1,
+          zIndex: carouselActive ? 0 : 4,
         }}
         transition={{
           duration: 0.5,
@@ -235,30 +277,33 @@ const Crafted: React.FC = () => {
         CRAFTED
       </TextName>
 
-      {/* Initial diagonal images when carousel is not active */}
       <AnimatePresence>
         {!carouselActive && <>{getInitialStackedImages()}</>}
       </AnimatePresence>
 
-      {/* Carousel that appears when activated */}
       <CarouselContainer
+        ref={carouselRef}
         initial={{ opacity: 0 }}
         animate={{
           opacity: carouselActive ? 1 : 0,
           zIndex: carouselActive ? 5 : -1,
+
           transition: { duration: 0.5 },
-        }}>
+        }}
+        onWheel={handleWheel}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.5}
+        dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+        onDragEnd={handleDragEnd}>
         <AnimatePresence initial={false}>
           {images.map((image, index) => {
-            // Calculate position relative to active image
             const position = index - activeIndex;
 
-            // Handle wraparound
             let normalizedPosition = position;
             if (position < -1) normalizedPosition += images.length;
             if (position > 1) normalizedPosition -= images.length;
 
-            // Only render the active image and immediate neighbors
             const shouldRender =
               normalizedPosition === 0 ||
               normalizedPosition === 1 ||
@@ -277,7 +322,7 @@ const Crafted: React.FC = () => {
                         opacity: 0,
                         x: 0,
                         scale: 0.5,
-                        zIndex: -1,
+                        zIndex: 2,
                       }
                 }
                 transition={{

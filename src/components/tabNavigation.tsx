@@ -40,7 +40,7 @@ const TabContainer = styled(motion.div)<{
   background: ${(props) =>
     props.isContactSection
       ? "rgba(255, 255, 255, 0.15)"
-      : "rgba(255, 255, 255, 0.50)"};
+      : "rgba(255, 255, 255, 0.80)"};
   box-shadow: ${(props) =>
     props.isContactSection ? "0 4px 4px rgba(31, 38, 135, 0.1)" : "none"};
 `;
