@@ -141,7 +141,9 @@ const Crafted: React.FC = () => {
   };
 
   const handleNext = () => {
-    setDirection(1);
+    let New_direction = direction;
+    New_direction = 1;
+    setDirection(New_direction);
     setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 

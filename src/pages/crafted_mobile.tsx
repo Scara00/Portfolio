@@ -70,7 +70,7 @@ const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [carouselActive, setCarouselActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -131,7 +131,9 @@ const Crafted: React.FC = () => {
   };
 
   const handleNext = () => {
-    setDirection(1);
+    let New_direction = direction;
+    New_direction = 1;
+    setDirection(New_direction);
     setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
