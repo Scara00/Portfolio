@@ -66,7 +66,7 @@ const StyledImage = styled(motion.img)`
   box-shadow: -4px -4px 12px 0px rgba(0, 0, 0, 0.12);
 `;
 
-const Crafted: React.FC = () => {
+const CraftedMobile: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [carouselActive, setCarouselActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -342,4 +342,4 @@ const Crafted: React.FC = () => {
   );
 };
 
-export default Crafted;
+export default CraftedMobile;

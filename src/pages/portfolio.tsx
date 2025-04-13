@@ -343,12 +343,39 @@ const Portfolio: React.FC = () => {
         <div className="chivo-mono">{location}</div>
         <div className="chivo-mono">{currentTime}</div>
       </ContainerTextPositionTime>
+      {activeSection === 0 && isMobile && (
+        <ContainerTextInfo isMobile={isMobile}>
+          <div
+            className="chivo-mono"
+            style={{ fontSize: isMobile ? "12px" : "16px" }}>
+            Scroll up or down to navigate the portfolio.
+          </div>
+        </ContainerTextInfo>
+      )}
+      {activeSection === 1 && isMobile && (
+        <ContainerTextInfo isMobile={isMobile}>
+          <div
+            className="chivo-mono"
+            style={{ fontSize: isMobile ? "12px" : "16px" }}>
+            Click on Crafted to see some of my work.
+          </div>
+        </ContainerTextInfo>
+      )}
+      {activeSection === 2 && isMobile && (
+        <ContainerTextInfo isMobile={isMobile}>
+          <div
+            className="chivo-mono"
+            style={{ fontSize: isMobile ? "12px" : "16px" }}>
+            Click on Crafted Mobile to see some of my work.
+          </div>
+        </ContainerTextInfo>
+      )}
       {activeSection === 0 && isDesktop && (
         <ContainerTextInfo isMobile={isMobile}>
           <div
             className="chivo-mono"
             style={{ fontSize: isMobile ? "12px" : "16px" }}>
-            Usa le frecce ↑, ↓ per navigare il portfolio.
+            Use the ↑, ↓ arrows to navigate the portfolio.
           </div>
         </ContainerTextInfo>
       )}
@@ -357,7 +384,7 @@ const Portfolio: React.FC = () => {
           <div
             className="chivo-mono"
             style={{ fontSize: isMobile ? "12px" : "16px" }}>
-            Usa la freccia → per vedere alcuni miei lavori.
+            Use the → arrow to see some of my work.
           </div>
         </ContainerTextInfo>
       )}

@@ -76,7 +76,6 @@ const Crafted: React.FC = () => {
   const { isMobile, isTablet } = useDeviceType();
   const [carouselActive, setCarouselActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -121,20 +120,20 @@ const Crafted: React.FC = () => {
   const getInitialPosition = (index: number) => {
     if (index === 0) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
-        transform: "translate(-80%, -50%)",
+        maxWidth: isMobile ? "200px" : isTablet ? "400px" : "700px",
+        transform: "translate(-80%, -80%)",
         zIndex: 1,
       };
     } else if (index === 1) {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
+        maxWidth: isMobile ? "200px" : isTablet ? "400px" : "700px",
         transform: "translate(-50%, -50%)",
         zIndex: 2,
       };
     } else {
       return {
-        maxWidth: isMobile ? "150px" : isTablet ? "250px" : "300px",
-        transform: "translate(-20%, -50%)",
+        maxWidth: isMobile ? "200px" : isTablet ? "400px" : "700px",
+        transform: "translate(-20%, -20%)",
         zIndex: 3,
       };
     }
@@ -228,9 +227,9 @@ const Crafted: React.FC = () => {
 
   const getImageSize = (isActive: boolean) => {
     if (isMobile) {
-      return isActive ? 200 : 80;
+      return isActive ? 250 : 150;
     } else if (isTablet) {
-      return isActive ? 500 : 300;
+      return isActive ? 600 : 500;
     }
     return isActive ? 800 : 500;
   };
@@ -269,7 +268,7 @@ const Crafted: React.FC = () => {
         onTap={() => setCarouselActive(true)}
         className="agera-mono"
         style={{
-          fontSize: isMobile ? "70px" : isTablet ? "200px" : "280px",
+          fontSize: isMobile ? "80px" : isTablet ? "200px" : "280px",
           textAlign: "center",
         }}
         animate={{

@@ -75,7 +75,7 @@ const Skills: React.FC = () => {
   >([]);
 
   // Calculate icon size based on device
-  const iconSize = isMobile ? 40 : isTablet ? 60 : 70;
+  const iconSize = isMobile ? 20 : isTablet ? 60 : 70;
 
   // Setup container dimensions and initial icon positions
   useEffect(() => {
@@ -96,13 +96,14 @@ const Skills: React.FC = () => {
       id: skill.id,
       x: random(iconSize, window.innerWidth - iconSize),
       y: random(iconSize, window.innerHeight - iconSize),
-      velocityX: random(-3, 3), // Moderate speed
-      velocityY: random(-3, 3), // Moderate speed
+      velocityX: isMobile ? random(-1, 2) : random(-3, 3), // Moderate speed
+      velocityY: isMobile ? random(-1, 2) : random(-3, 3), // Moderate speed
       size: iconSize,
       icon: skill.icon,
       name: skill.name,
     };
   });
+
   // Animation loop for bouncing effect
   useEffect(() => {
     if (bouncingIcons.length === 0) return;
