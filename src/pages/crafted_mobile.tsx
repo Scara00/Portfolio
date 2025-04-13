@@ -222,7 +222,7 @@ const CraftedMobile: React.FC = () => {
     } else if (isTablet) {
       return isActive ? 500 : 300;
     }
-    return isActive ? 800 : 500;
+    return isActive ? 500 : 400;
   };
 
   const getImageProps = (index: number) => {
@@ -240,7 +240,7 @@ const CraftedMobile: React.FC = () => {
 
     const isActive = position === 0;
     const zIndex = isActive ? 10 : 6;
-    const opacity = isActive ? 1 : 0.8;
+    const opacity = isActive ? 1 : 0.6;
     const scale = isActive ? 1 : 0.85;
 
     return {
