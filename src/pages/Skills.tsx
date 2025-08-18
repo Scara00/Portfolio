@@ -75,7 +75,7 @@ const Skills: React.FC = () => {
   >([]);
 
   // Calculate icon size based on device
-  const iconSize = isMobile ? 20 : isTablet ? 60 : 70;
+  const iconSize = isMobile ? 30 : isTablet ? 60 : 70;
 
   // Setup container dimensions and initial icon positions
   useEffect(() => {
